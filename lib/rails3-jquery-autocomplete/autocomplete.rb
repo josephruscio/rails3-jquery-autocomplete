@@ -46,20 +46,26 @@ module Rails3JQueryAutocomplete
 
           method = options[:column_name] if options.has_key?(:column_name)
 
-          term = params[:term]
-
-          if term && !term.blank?
-            #allow specifying fully qualified class name for model object
-            class_name = options[:class_name] || object
-            items = get_autocomplete_items(:model => get_object(class_name), \
-              :options => options, :term => term, :method => method)
-          else
-            items = {}
-          end
+          items = autocomplete_object(object, method, options)
 
           render :json => json_for_autocomplete(items, options[:display_value] ||= method, options[:extra_data])
         end
       end
+    end
+
+    def autocomplete_object(object, method, options = {})
+      term = params[:term]
+
+      if term && !term.blank?
+        #allow specifying fully qualified class name for model object
+        class_name = options[:class_name] || object
+        items = get_autocomplete_items(:model => get_object(class_name), \
+          :options => options, :term => term, :method => method)
+      else
+        items = {}
+      end
+
+    items
     end
 
     # Returns a limit that will be used on the query
