@@ -51,6 +51,20 @@ module Rails3JQueryAutocomplete
           render :json => json_for_autocomplete(items, options[:display_value] ||= method, options[:extra_data])
         end
       end
+
+      def autocomplete_multi(name, method, objects, options = {})
+        define_method("autocomplete_#{name}_#{method}") do
+
+          items = []
+          method = options[:column_name] if options.has_key?(:column_name)
+
+          objects.each do |obj|
+            items = items + (autocomplete_object(obj, method, options))
+          end
+
+          render :json => json_for_autocomplete(items, options[:display_value] ||= method, options[:extra_data])
+        end
+      end
     end
 
     def autocomplete_object(object, method, options = {})
