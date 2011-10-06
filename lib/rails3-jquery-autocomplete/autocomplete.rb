@@ -48,7 +48,8 @@ module Rails3JQueryAutocomplete
 
           items = autocomplete_object(object, method, options)
 
-          render :json => json_for_autocomplete(items, options[:display_value] ||= method, options[:extra_data])
+          render :json => json_for_autocomplete(items, options[:display_value] ||= method, options[:extra_data],
+                                               options[:extra_methods])
         end
       end
 
@@ -62,7 +63,8 @@ module Rails3JQueryAutocomplete
             items = items + (autocomplete_object(obj, method, options))
           end
 
-          render :json => json_for_autocomplete(items, options[:display_value] ||= method, options[:extra_data])
+          render :json => json_for_autocomplete(items, options[:display_value] ||= method, options[:extra_data],
+                                               options[:extra_methods])
         end
       end
     end
@@ -79,7 +81,7 @@ module Rails3JQueryAutocomplete
         items = {}
       end
 
-    items
+      items
     end
 
     # Returns a limit that will be used on the query
@@ -101,12 +103,18 @@ module Rails3JQueryAutocomplete
     # Can be overriden to show whatever you like
     # Hash also includes a key/value pair for each method in extra_data
     #
-    def json_for_autocomplete(items, method, extra_data=[])
+    def json_for_autocomplete(items, method, extra_data=[], extra_methods=[])
       items.collect do |item|
         hash = {"id" => item.id.to_s, "label" => item.send(method), "value" => item.send(method)}
+
         extra_data.each do |datum|
           hash[datum] = item.send(datum)
         end if extra_data
+
+        extra_methods.each do |datum|
+          hash[datum] = item.send(datum)
+        end if extra_methods
+
         # TODO: Come back to remove this if clause when test suite is better
         hash
       end
